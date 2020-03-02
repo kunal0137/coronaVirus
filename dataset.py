@@ -1,0 +1,27 @@
+import pandas as pd;
+url_confirmed="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
+confirmed=pd.read_csv(url_confirmed);
+confirmed_delta=confirmed.iloc[:,4:].diff(axis=1);
+confirmed_delta=confirmed_delta.drop(columns=['1/22/20']);
+confirmed_delta = pd.concat([confirmed.iloc[:,:5], confirmed_delta], axis=1);
+confirmed_delta=pd.melt(confirmed_delta, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Confirmed_Added');
+confirmed=pd.melt(confirmed, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Confirmed');
+confirmed=pd.merge(confirmed, confirmed_delta, on=['Province/State','Country/Region','Lat','Long','DateReported']);
+url_deaths="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
+deaths=pd.read_csv(url_deaths);
+deaths_delta=deaths.iloc[:,4:].diff(axis=1);
+deaths_delta=deaths_delta.drop(columns=['1/22/20']);
+deaths_delta = pd.concat([deaths.iloc[:,:5], deaths_delta], axis=1);
+deaths_delta=pd.melt(deaths_delta, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Deaths_Added');
+deaths=pd.melt(deaths, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Deaths');
+deaths=pd.merge(deaths, deaths_delta, on=['Province/State','Country/Region','Lat','Long','DateReported']);
+url_recovered="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+recovered=pd.read_csv(url_recovered);
+recovered_delta=recovered.iloc[:,4:].diff(axis=1);
+recovered_delta=recovered_delta.drop(columns=['1/22/20']);
+recovered_delta = pd.concat([recovered.iloc[:,:5], recovered_delta], axis=1);
+recovered_delta=pd.melt(recovered_delta, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Recovered_Added');
+recovered=pd.melt(recovered, id_vars=['Province/State','Country/Region','Lat','Long'],var_name='DateReported',value_name='Recovered');
+recovered=pd.merge(recovered, recovered_delta, on=['Province/State','Country/Region','Lat','Long','DateReported']);
+combined_temp=pd.merge(confirmed, deaths, on=['Province/State','Country/Region','Lat','Long','DateReported']);
+combined=pd.merge(combined_temp, recovered, on=['Province/State','Country/Region','Lat','Long','DateReported']);
